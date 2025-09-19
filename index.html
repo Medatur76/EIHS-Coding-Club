@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>EIHS Coding Club</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Silkscreen&display=swap" rel="stylesheet">
+        <style>
+            @keyframes pulse {
+                
+            }
+            body {
+                background-color: black;
+            }
+            div.header_container {
+                margin-top: 25vh;
+                height: 10%;
+                width: 100%;
+            }
+            h1.title {
+                font-size: 150px;
+                color: rgb(0, 179, 9);
+                font-family: "Silkscreen", sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header_container"></div>
+        <script defer type="text/javascript">
+            const container = document.querySelector("div.header_container");
+            
+            const title_container = container.appendChild(document.createElement("div")), title_text = title_container.appendChild(document.createElement("h1")), title_cursor = title_container.appendChild(document.createElement("div"));
+            title_container.classList = "title_container";
+            title_text.classList = "title";
+            title_cursor.classList = "title_cursor";
+            function typeWriter(i, text, element) {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 100, i, text, element);
+                }
+            }
+            setTimeout(() => {
+                typeWriter(0, 'Coding Club', title_text)
+            }, 2000);
+        </script>
+    </body>
+</html>
