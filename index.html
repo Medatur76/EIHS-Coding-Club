@@ -7,12 +7,40 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Silkscreen&display=swap" rel="stylesheet">
+        <link href='https://fonts.googleapis.com/css?family=Material Symbols Rounded' rel='stylesheet'>
         <style>
             @keyframes pulse {
-                
+                0%, 10% {
+                    opacity: 1;
+                }
+                100% {
+                    opacity: 0;
+                }
+            }
+            @keyframes grow {
+                from {
+                    width: 0;
+                    height: 0;
+                    font-size: 0px;
+                }
+                to {
+                    width: 100%;
+                    height: 100%;
+                    font-size: 30px;
+                }
+            }
+            .material_icons {
+                font-family: 'Material Symbols Rounded', sans-serif;
+                font-size: 30px;
+            }
+            div.window_buttons {
+                position: absolute;
+                right: 0;
+                top: 0;
             }
             body {
                 background-color: black;
+                color: rgb(0, 172, 9);
             }
             div.header_container {
                 margin-top: 25vh;
@@ -24,27 +52,85 @@
                 color: rgb(0, 179, 9);
                 font-family: "Silkscreen", sans-serif;
             }
+            div.background_animation {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                color: rgb(0, 100, 5);
+                font-family: "Silkscreen", sans-serif;
+            }
+            span.terminal_cursor {
+                animation: pulse 0.75s infinite alternate;
+            }
         </style>
     </head>
     <body>
-        <div class="header_container"></div>
+        <div class="background_animation" style='position: absolute;top: 0;left: 0;width: 100%;height: 100%;color: rgb(0, 100, 5);font-family: "Silkscreen", sans-serif;'></div>
         <script defer type="text/javascript">
-            const container = document.querySelector("div.header_container");
-            
-            const title_container = container.appendChild(document.createElement("div")), title_text = title_container.appendChild(document.createElement("h1")), title_cursor = title_container.appendChild(document.createElement("div"));
-            title_container.classList = "title_container";
-            title_text.classList = "title";
-            title_cursor.classList = "title_cursor";
-            function typeWriter(i, text, element) {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
+            const background = document.querySelector("div.background_animation"), text = background.appendChild(document.createElement("span")), cursor = background.appendChild(document.createElement("span"));
+            text.classList = "terminal_text";
+            text.textContent = "> ";
+            cursor.classList = "terminal_cursor";
+            cursor.textContent = "|";
+            const command = "browser.bat load ehis_coding_website.html"
+            function type(i) {
+                if (i < command.length) {
+                    text.innerHTML += command.charAt(i);
                     i++;
-                    setTimeout(typeWriter, 100, i, text, element);
+                    setTimeout(type, 100, i);
+                } else if (i == command.length) {
+                    text.innerHTML += "<br>";
                 }
             }
-            setTimeout(() => {
-                typeWriter(0, 'Coding Club', title_text)
-            }, 2000);
+            function typeConsole(i, input) {
+                if (i < input.length) {
+                    text.innerHTML += input.charAt(i) == "\n" ? "<br>" : input.charAt(i) == 'x' ? '<span style="color:rgba(0,0,0,0);">_</span>' : input.charAt(i) == '`' ? '<span style="color:rgba(0,0,0,0);">`</span>' : input.charAt(i);
+                    i++;
+                    setTimeout(typeConsole, 50, i, input);
+                } else if (i == input.length) {
+                    cursor.remove();
+                }
+            }
+            async function animation() {
+                var t;
+                await fetch("./console.txt").then(response => response.text()).then(textOutput => {
+                        t = textOutput;
+                        console.log(t.length);
+                });
+                setTimeout(type, 2000, 0);
+
+                setTimeout(() => {
+                    cursor.classList = "";
+                    setTimeout(typeConsole, 50, 0, t);
+                }, 3000 + 100 * (command.length));
+
+                var windowEm;
+
+                setTimeout(() => {
+                    windowEm = document.body.appendChild(document.createElement("div"));
+                    const buttons = windowEm.appendChild(document.createElement("div")), mini = buttons.appendChild(document.createElement("span")), full = buttons.appendChild(document.createElement("span")), close = buttons.appendChild(document.createElement("span"));
+                    buttons.classList = "material_icons window_buttons";
+                    mini.textContent = "remove";
+                    full.textContent = "check_box_outline_blank";
+                    close.textContent = "close";
+                    windowEm.style = "animation: grow 0.5s; bottom: 0; left: 0;background-color: black;border: 2px solid rgb(0, 172, 9);position: absolute; z-index: 5;";
+                }, 4000 + 100 * (command.length) + 60 * (t.length+28));
+
+                setTimeout(() => {
+                    windowEm.classList = "window";
+                    windowEm.removeAttribute("style");
+                    background.remove();
+                    windowEm.remove();
+                    const buttons = document.body.insertBefore(document.createElement("div"), document.body.firstChild), mini = buttons.appendChild(document.createElement("span")), full = buttons.appendChild(document.createElement("span")), close = buttons.appendChild(document.createElement("span"));
+                    buttons.classList = "material_icons window_buttons";
+                    mini.textContent = "remove";
+                    full.textContent = "check_box_outline_blank";
+                    close.textContent = "close";
+                }, 4500 + 100 * command.length + 60 * (t.length+28));
+            }
+            animation();
         </script>
     </body>
 </html>
