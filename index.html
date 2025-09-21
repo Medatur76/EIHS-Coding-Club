@@ -24,15 +24,15 @@
             @keyframes flash {
                 0% {
                     background-color: rgb(117, 182, 120);
-                    color: rgba(0, 172, 9, 0);
+                    color: rgba(var(--text_color), 0);
                 }
                 30% {
                     background-color: rgba(52, 179, 58, 0.4);
-                    color: rgba(0, 172, 9, .4);
+                    color: rgba(var(--text_color), .4);
                 }
                 100% {
                     background-color: rgb(1, 129, 8, 0);
-                    color: rgba(0, 172, 9);
+                    color: rgba(var(--text_color));
                 }
             }
             @keyframes blank_flash {
@@ -56,20 +56,26 @@
                 top: 0;
             }
             body {
+                --text_color: 0, 179, 9;
                 background-color: black;
-                color: rgb(0, 172, 9);
+                color: rgba(var(--text_color));
                 padding-top: 36px;
             }
             h1.title {
                 font-size: 150px;
-                color: rgb(0, 179, 9);
+                font-family: "Silkscreen", sans-serif;
+            }
+            h2.subtitle {
+                --text_color: 52, 99, 54;
+                color: rgba(var(--text_color));
+                font-size: 100px;
                 font-family: "Silkscreen", sans-serif;
             }
         </style>
     </head>
     <body>
         <div class="background_animation" style='position: absolute;top: 0;left: 0;width: 100%;height: 100%;color: rgb(0, 100, 5);font-family: "Silkscreen", sans-serif;'></div>
-        <script defer type="text/javascript">
+        <script defer type="text/javascript" id="main">
             function delay(ms) {
                 return new Promise(resolve => setTimeout(resolve, ms));
             }
@@ -82,16 +88,25 @@
 
             const consoleMessages = [
                 () => `Pinging ${ip()} with 32 bytes of data`,
-                () => `${["Raising", "Folding", "Checking"][rand(0,2)]} with a${["n ace", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", " 10", " Jack", " Queen", " King"][rand(0, 13)]} of ${["Hearts", "Diamonds", "Clubs", "Spades"][rand(0, 3)]} and a${["n ace", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", " 10", " Jack", " Queen", " King"][rand(0, 13)]} of ${["Hearts", "Diamonds", "Clubs", "Spades"][rand(0, 3)]}`,
+                () => {
+                    const card1num = rand(0, 13), card1suite = rand(0, 3), card2num = rand(0, 13);
+                    var card2suite = rand(0, 3);
+                    if (card1num == card2num && card1suite == card2suite) {
+                        while (card1suite == card2suite) card2suite = rand(0, 3);
+                    }
+                    return `${["Raising", "Folding", "Checking"][rand(0,2)]} with a${["n ace", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", " 10", " Jack", " Queen", " King"][card1num]} of ${["Hearts", "Diamonds", "Clubs", "Spades"][card1suite]} and a${["n ace", " 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9", " 10", " Jack", " Queen", " King"][card2num]} of ${["Hearts", "Diamonds", "Clubs", "Spades"][card2suite]}`
+                },
                 () => `Ping recieved from ${ip()}`,
                 () => `Connecting to ${["TCP", "UDP"][rand(0, 1)]} ${ip()}`,
                 () => `Sending ${rand(2, 1024)} ${["bytes", "kilobytes", "megabytes", "gigabytes", "terabytes", "petabytes"][rand(0, 5)]} of data to ${ip()}`,
+                () => `Ping for ${ip()} is ${rand(0, 150)} ms`
             ];
 
             const background = document.querySelector("div.background_animation"), commandText = background.appendChild(document.createElement("span")), text = background.appendChild(document.createElement("span")), cursor = background.appendChild(document.createElement("span"));
             commandText.textContent = "> ";
+            text.style = "--text_color: 0, 100, 5;";
             cursor.style = "background-color: rgb(117, 182, 120);";
-            cursor.textContent = "\u00a0";
+            cursor.textContent = '\u00a0';
             const command = "browser.bat load ehis_coding_website.html"
             async function type(i) {
                 if (i < command.length) {
@@ -148,20 +163,48 @@
                     innerText.appendChild(document.createElement("br"));
                 }
             }
+
+            async function typeOut(element, text, optional = {}) {
+                const { speed = 100, cursor = false, cleanup = true, color = false } = optional;
+                var editElement = element;
+                if (cursor) {
+                    const textSpan = element.appendChild(document.createElement("span")), cursorElement = element.appendChild(document.createElement("span"));
+                    cursorElement.style = "background-color: rgb(117, 182, 120);";
+                    cursorElement.textContent = '\u00a0';
+                    editElement = textSpan;
+                    await delay(speed*5);
+                }
+                for (let char of text) {
+                    const container = editElement.appendChild(document.createElement("span"));
+                    container.style = `${color != false ? "--text_color: " + color + "; " : ""}animation: flash var(--text_color) 0.5s ease-out;`;
+                    container.textContent = char;
+                    await delay(speed);
+                }
+                if (cleanup) {
+                    await delay(500);
+                    element.innerHTML = text;
+                }
+            }
             async function animation() {
+                //Wait 2 seconds
                 await delay(2000);
 
+                //Type out start command
                 await type(0);
 
+                //Wait one second, cleanup the command line, remove the cursor, and type 10 random responses
                 await delay(1000);
                 commandText.innerHTML = "> " + command;
                 cursor.remove();
                 await typeRandom(10);
 
+                //Type out the completion and ASCII CODE text
                 await typeComplete();
 
+                //Wait 1.5 seconds
                 await delay(1500)
 
+                //Create the dummy window element and its buttons
                 var windowEm = document.body.appendChild(document.createElement("div")), buttons = windowEm.appendChild(document.createElement("div")), mini = buttons.appendChild(document.createElement("span")), full = buttons.appendChild(document.createElement("span")), close = buttons.appendChild(document.createElement("span"));
                 buttons.classList = "material_icons window_buttons";
                 mini.textContent = "remove";
@@ -169,6 +212,7 @@
                 close.textContent = "close";
                 windowEm.style = "animation: grow 0.5s; bottom: 0; left: 0;background-color: black;border: 2px solid rgb(0, 172, 9);position: absolute; z-index: 5;overflow: hidden;";
 
+                //Wait half a second then remove the dummy window element and put the buttons in the body
                 await delay(500);
                 background.remove();
                 windowEm.remove();
@@ -177,6 +221,17 @@
                 mini.textContent = "remove";
                 full.textContent = "check_box_outline_blank";
                 close.textContent = "close";
+
+                //Wait one second then type out the title
+                await delay(1000);
+                const title = document.body.insertBefore(document.createElement("h1"), document.body.querySelector("script#main"));
+                title.classList = "title";
+                await typeOut(title, "Coding Club", { cursor: true });
+                //Wait half a second then type out the subtitle
+                await delay(1000);
+                const subtitle = document.body.insertBefore(document.createElement("h2"), document.body.querySelector("script#main"));
+                subtitle.classList = "subtitle";
+                await typeOut(subtitle, "The club for epic coders", { cursor: true });
             }
             animation();
         </script>
