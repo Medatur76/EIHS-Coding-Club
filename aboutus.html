@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>About Us | Coding Club</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Silkscreen&display=swap" rel="stylesheet">
+        <style>
+            body {
+                background-color: black;
+                font-family: "Silkscreen", sans-serif;
+            }
+            @keyframes flash {
+                0% {
+                    background-color: rgb(117, 182, 120);
+                    color: rgba(var(--text_color), 0);
+                }
+                30% {
+                    background-color: rgba(52, 179, 58, 0.4);
+                    color: rgba(var(--text_color), .4);
+                }
+                100% {
+                    background-color: rgb(1, 129, 8, 0);
+                    color: rgba(var(--text_color));
+                }
+            }
+            div.textContainer {
+                --text_color: 0, 100, 5;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                color: rgb(0, 100, 5);
+            }
+        </style>
+    </head>
+    <body>
+        <script defer id="main">
+            function delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            async function pageAnimation() {
+                const textContainer = document.body.appendChild(document.createElement("div")), canvasWindowContainer = document.body.appendChild(document.createElement("div")), commandLine = textContainer.appendChild(document.createElement("span")), cursor = textContainer.appendChild(document.createElement("span"));
+                textContainer.classList = "textContainer";
+                textContainer.style = "--text_color: 0, 179, 9;";
+                canvasWindowContainer.style = "display: none;";
+                commandLine.textContent = "> ";
+                cursor.style = "background-color: rgb(117, 182, 120);";
+                cursor.textContent = '\u00a0';
+
+                await delay(2000);
+                for (let char of "browser.bat tell {user} about ehis_coding_club") {
+                    const charContainer = commandLine.appendChild(document.createElement("span"));
+                    charContainer.style = "animation: flash 0.5s ease-out;";
+                    charContainer.textContent = char;
+                    await delay(100);
+                }
+
+                await delay(500);
+                commandLine.innerHTML = "> browser.bat tell {user} about ehis_coding_club";
+                textContainer.insertBefore(document.createElement("br"), cursor);
+
+                await delay(1500);
+                cursor.remove();
+            }
+
+            pageAnimation();
+        </script>
+    </body>
+</html>

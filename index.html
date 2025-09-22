@@ -59,8 +59,24 @@
                 --text_color: 0, 179, 9;
                 background-color: black;
                 color: rgba(var(--text_color));
-                padding-top: 36px;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
             }
+
+            div.window {
+                background-color: inherit;
+                padding-top: 36px;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                overflow-y: scroll;
+                padding-right: 17px; /* Increase/decrease this value for cross-browser compatibility */
+                box-sizing: content-box;
+            }
+
             h1.title {
                 font-size: 150px;
                 font-family: "Silkscreen", sans-serif;
@@ -101,6 +117,8 @@
                 () => `Sending ${rand(2, 1024)} ${["bytes", "kilobytes", "megabytes", "gigabytes", "terabytes", "petabytes"][rand(0, 5)]} of data to ${ip()}`,
                 () => `Ping for ${ip()} is ${rand(0, 150)} ms`
             ];
+
+            const script = document.body.querySelector("script#main");
 
             const background = document.querySelector("div.background_animation"), commandText = background.appendChild(document.createElement("span")), text = background.appendChild(document.createElement("span")), cursor = background.appendChild(document.createElement("span"));
             commandText.textContent = "> ";
@@ -158,7 +176,7 @@
                             container.style = "animation: flash 0.5s ease-out;";
                             container.textContent = char;
                         }
-                        await delay(20);
+                        await delay(10);
                     }
                     innerText.appendChild(document.createElement("br"));
                 }
@@ -204,7 +222,7 @@
                 //Wait 1.5 seconds
                 await delay(1500)
 
-                //Create the dummy window element and its buttons
+                //Create the window element and its buttons
                 var windowEm = document.body.appendChild(document.createElement("div")), buttons = windowEm.appendChild(document.createElement("div")), mini = buttons.appendChild(document.createElement("span")), full = buttons.appendChild(document.createElement("span")), close = buttons.appendChild(document.createElement("span"));
                 buttons.classList = "material_icons window_buttons";
                 mini.textContent = "remove";
@@ -212,26 +230,24 @@
                 close.textContent = "close";
                 windowEm.style = "animation: grow 0.5s; bottom: 0; left: 0;background-color: black;border: 2px solid rgb(0, 172, 9);position: absolute; z-index: 5;overflow: hidden;";
 
-                //Wait half a second then remove the dummy window element and put the buttons in the body
                 await delay(500);
-                background.remove();
-                windowEm.remove();
-                buttons = document.body.insertBefore(document.createElement("div"), document.body.firstChild), mini = buttons.appendChild(document.createElement("span")), full = buttons.appendChild(document.createElement("span")), close = buttons.appendChild(document.createElement("span"));
-                buttons.classList = "material_icons window_buttons";
-                mini.textContent = "remove";
-                full.textContent = "check_box_outline_blank";
-                close.textContent = "close";
+                windowEm.removeAttribute("style");
+                windowEm.classList = "window";
+                //background.remove();
 
                 //Wait one second then type out the title
                 await delay(1000);
-                const title = document.body.insertBefore(document.createElement("h1"), document.body.querySelector("script#main"));
+                const title = windowEm.appendChild(document.createElement("h1"));
                 title.classList = "title";
                 await typeOut(title, "Coding Club", { cursor: true });
                 //Wait half a second then type out the subtitle
                 await delay(1000);
-                const subtitle = document.body.insertBefore(document.createElement("h2"), document.body.querySelector("script#main"));
+                const subtitle = windowEm.appendChild(document.createElement("h2"));
                 subtitle.classList = "subtitle";
                 await typeOut(subtitle, "The club for epic coders", { cursor: true });
+
+                //Delete this script cuz its big idk
+                //script.remove();
             }
             animation();
         </script>
