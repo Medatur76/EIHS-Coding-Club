@@ -61,7 +61,15 @@
                 color: rgba(var(--text_color));
                 width: 100%;
                 height: 100%;
-                overflow: hidden;
+                -ms-overflow-style: none;
+            }
+
+            body::-webkit-scrollbar, body::-webkit-scrollbar-button {
+                display: none;
+            }
+
+            html {
+                scrollbar-width: none;
             }
 
             div.window {
@@ -72,9 +80,6 @@
                 width: 100%;
                 height: 100%;
                 position: absolute;
-                overflow-y: scroll;
-                padding-right: 17px; /* Increase/decrease this value for cross-browser compatibility */
-                box-sizing: content-box;
             }
 
             h1.title {
